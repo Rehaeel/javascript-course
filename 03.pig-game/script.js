@@ -21,13 +21,17 @@ diceEl.classList.add('hidden');
 let scores = [0, 0];
 let currentScore = 0;
 let activePlayer = 0;
+let playing = true;
 
 // Helper functions/declarations
 const newGame = function () {
+  document.querySelector('.player--winner').classList.remove('player--winner');
   !diceEl.classList.contains('hidden') ? diceEl.classList.add('hidden') : '';
   scores = [0, 0];
   currentScore = 0;
   activePlayer = 0;
+  player0El.classList.add('player--active');
+  playing = true;
   score0El.textContent = 0;
   score1El.textContent = 0;
   current0El.textContent = 0;
@@ -44,23 +48,36 @@ const nextPlayer = function () {
 };
 
 const rollADice = function () {
-  const dice = Math.trunc(Math.random() * 6) + 1;
+  if (playing) {
+    const dice = Math.trunc(Math.random() * 6) + 1;
 
-  diceEl.classList.remove('hidden');
-  diceEl.src = `dice-${dice}.png`;
+    diceEl.classList.remove('hidden');
+    diceEl.src = `dice-${dice}.png`;
 
-  if (dice !== 1) {
-    currentScore += dice;
-    document.getElementById(`current--${activePlayer}`).textContent =
-      currentScore;
-  } else nextPlayer();
+    if (dice !== 1) {
+      currentScore += dice;
+      document.getElementById(`current--${activePlayer}`).textContent =
+        currentScore;
+    } else nextPlayer();
+  }
 };
 
 const holdPoints = function () {
-  scores[activePlayer] += currentScore;
-  score0El.textContent = scores[0];
-  score1El.textContent = scores[1];
-  nextPlayer();
+  if (playing) {
+    scores[activePlayer] += currentScore;
+    document.getElementById(`score--${activePlayer}`).textContent =
+      scores[activePlayer];
+    if (scores[activePlayer] >= 100) {
+      playing = false;
+      document
+        .querySelector(`.player--${activePlayer}`)
+        .classList.add('player--winner');
+      document
+        .querySelector(`.player--${activePlayer}`)
+        .classList.remove('player--active');
+      diceEl.classList.add('hidden');
+    } else nextPlayer();
+  }
 };
 
 // Rolling dice functionality
